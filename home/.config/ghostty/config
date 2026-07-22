@@ -1,0 +1,42 @@
+# Theme
+theme = Catppuccin Macchiato
+
+# Font
+font-family = JetBrainsMono Nerd Font
+font-size = 15
+font-thicken = true
+
+# Shell
+shell-integration = zsh
+quit-after-last-window-closed = true
+
+# Cursor
+cursor-style = block
+cursor-style-blink = true
+
+# Clipboard
+clipboard-read = allow
+clipboard-write = allow
+copy-on-select = clipboard
+
+# macOS
+macos-option-as-alt = true
+macos-titlebar-proxy-icon = hidden
+
+# Window
+window-width = 120
+window-height = 40
+window-padding-x = 8
+window-padding-y = 6
+window-padding-balance = true
+window-padding-color = background
+window-colorspace = display-p3
+background-opacity = 1.0
+unfocused-split-opacity = 0.95
+
+# Scroll
+mouse-scroll-multiplier = 0.5
+scrollback-limit = 100000
+
+# Updates
+auto-update-channel = stable

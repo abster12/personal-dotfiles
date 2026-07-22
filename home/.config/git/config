@@ -1,0 +1,56 @@
+[user]
+	name = Abhigyan
+	email = abhigyan0987@gmail.com
+
+[init]
+	defaultBranch = main
+
+[core]
+	editor = nvim
+	autocrlf = input
+	excludesfile = ~/.config/git/ignore
+
+[pull]
+	rebase = true
+
+[fetch]
+	prune = true
+
+[push]
+	autoSetupRemote = true
+	default = simple
+
+[rebase]
+	autoStash = true
+	updateRefs = true
+
+[rerere]
+	enabled = true
+
+[branch]
+	sort = -committerdate
+
+[column]
+	ui = auto
+
+[diff]
+	algorithm = histogram
+	colorMoved = plain
+
+[merge]
+	conflictstyle = zdiff3
+
+[alias]
+	st = status -sb
+	co = checkout
+	br = branch
+	ci = commit
+	lg = log --oneline --graph --decorate -20
+	ll = log --oneline --graph --decorate --all -30
+	last = log -1 --stat
+	unstage = restore --staged
+	undo = reset --soft HEAD~1
+	# fetch default branch from origin and rebase onto it
+	fomo = "!f() { b=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@'); b=${b:-main}; git fetch origin \"$b\" && git rebase \"origin/$b\" --autostash; }; f"
+	# tidy local branches already merged into default branch
+	cleanup = "!f() { b=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@'); b=${b:-main}; git fetch --prune && git branch --merged \"$b\" | grep -v \"^[ *]*$b$\" | xargs -n 1 git branch -d; }; f"
