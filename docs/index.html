@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dotfiles · workflow reference</title>
+<style>
+  :root {
+    --bg:       #1e1e2e;
+    --surface:  #181825;
+    --overlay:  #313244;
+    --text:     #cdd6f4;
+    --subtext:  #a6adc8;
+    --muted:    #6c7086;
+    --blue:     #89b4fa;
+    --lavender: #b4befe;
+    --green:    #a6e3a1;
+    --yellow:   #f9e2af;
+    --red:      #f38ba8;
+    --teal:     #94e2d5;
+    --border:   #45475a;
+    --radius:   8px;
+    --font:     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    --mono:     "SF Mono", "Fira Code", "Cascadia Code", "JetBrains Mono", "Menlo", monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    line-height: 1.6;
+    padding: 1.5rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: .25rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+  }
+  h1 small {
+    font-weight: 400;
+    font-size: .85rem;
+    color: var(--muted);
+  }
+  .subtitle {
+    color: var(--subtext);
+    font-size: .9rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: .75rem;
+  }
+  .subtitle a { color: var(--blue); text-decoration: none; }
+  .subtitle a:hover { text-decoration: underline; }
+
+  /* --- Tabs --- */
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--border);
+    padding-left: 4px;
+  }
+  .tab-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: none;
+    padding: .55rem .95rem;
+    font-family: var(--font);
+    font-size: .85rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: var(--radius) var(--radius) 0 0;
+    transition: .15s;
+    margin-bottom: -1px;
+  }
+  .tab-btn:hover { color: var(--text); background: var(--overlay); }
+  .tab-btn.active {
+    color: var(--blue);
+    background: var(--surface);
+    border-color: var(--border);
+    border-bottom-color: var(--surface);
+  }
+  .tab-btn .badge {
+    display: inline-block;
+    background: var(--overlay);
+    color: var(--subtext);
+    font-size: .7rem;
+    border-radius: 9px;
+    padding: 0 7px;
+    margin-left: 4px;
+    font-weight: 600;
+  }
+  .tab-btn.active .badge { background: var(--blue); color: var(--bg); }
+
+  /* --- Panels --- */
+  .panel {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding: 1.25rem;
+  }
+  .panel.active { display: block; }
+
+  h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: .75rem;
+    color: var(--lavender);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  h2 .hint {
+    font-weight: 400;
+    font-size: .8rem;
+    color: var(--muted);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9rem;
+  }
+  th {
+    text-align: left;
+    padding: .45rem .6rem;
+    font-weight: 600;
+    color: var(--subtext);
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: .5rem .6rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+
+  .key {
+    font-family: var(--mono);
+    font-size: .8rem;
+    background: var(--overlay);
+    padding: 1px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    color: var(--yellow);
+  }
+  .key.leader::before { content: "<leader>"; color: var(--muted); }
+  td:first-child { white-space: nowrap; width: 1%; padding-right: 1rem; }
+  td:nth-child(2) { color: var(--subtext); font-size: .85rem; }
+  td .note {
+    display: block;
+    font-size: .78rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .section { margin-bottom: 1.5rem; }
+  .section:last-child { margin-bottom: 0; }
+
+  .cmd {
+    font-family: var(--mono);
+    font-size: .85rem;
+    background: var(--overlay);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: var(--teal);
+  }
+
+  /* hash jump highlight */
+  .panel:target { display: block; }
+  .panel:target ~ .panel.active:not(:target) { display: none; }
+  /* When a hash is present, activate the corresponding tab — handled by JS */
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    body { padding: .75rem; }
+    .tab-btn { font-size: .8rem; padding: .4rem .6rem; }
+    td, th { font-size: .82rem; padding: .4rem .4rem; }
+    .key { font-size: .75rem; }
+  }
+
+  .empty-state {
+    color: var(--muted);
+    font-style: italic;
+    padding: 1rem 0;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>
+  <span>~/.dotfiles</span>
+  <small>workflow reference</small>
+</h1>
+<div style="font-size:.82rem;color:var(--muted);margin-bottom:.5rem">
+  <strong style="color:var(--yellow)">What is &lt;leader&gt;?</strong>
+  In your config <code>&lt;leader&gt;</code> is the
+  <kbd style="background:var(--overlay);padding:1px 6px;border-radius:4px;font-family:var(--mono);color:var(--yellow);font-weight:600">Space</kbd>
+  key. So <code>&lt;leader&gt;ff</code> means press
+  <kbd style="background:var(--overlay);padding:1px 6px;border-radius:4px;color:var(--yellow)">Space</kbd> then
+  <kbd style="background:var(--overlay);padding:1px 6px;border-radius:4px;color:var(--yellow)">f</kbd>
+  <kbd style="background:var(--overlay);padding:1px 6px;border-radius:4px;color:var(--yellow)">f</kbd>.
+  <code>&lt;C-</code> means <kbd style="background:var(--overlay);padding:1px 6px;border-radius:4px;color:var(--yellow)">Ctrl</kbd>,
+  <code>&lt;A-</code> means <kbd style="background:var(--overlay);padding:1px 6px;border-radius:4px;color:var(--yellow)">Option</kbd>,
+  <code>&lt;S-</code> means <kbd style="background:var(--overlay);padding:1px 6px;border-radius:4px;color:var(--yellow)">Shift</kbd>.
+</div>
+<p class="subtitle">
+  <a href="https://github.com/abster12/personal-dotfiles" target="_blank">github.com/abster12/personal-dotfiles</a>
+  ·
+  <a href="#shell">shell</a>
+  ·
+  <a href="#git">git</a>
+  ·
+  <a href="#nvim-base">nvim</a>
+  ·
+  <a href="#nvim-telescope">telescope</a>
+  ·
+  <a href="#nvim-harpoon">harpoon</a>
+  ·
+  <a href="#nvim-oil">oil</a>
+  ·
+  <a href="#nvim-lsp">lsp</a>
+</p>
+
+<!-- Tabs -->
+<div class="tabs" role="tablist">
+  <button class="tab-btn active" role="tab" data-tab="shell"        aria-selected="true">🐚  Shell      <span class="badge">14</span></button>
+  <button class="tab-btn"        role="tab" data-tab="git"          aria-selected="false">🐙  Git        <span class="badge">11</span></button>
+  <button class="tab-btn"        role="tab" data-tab="nvim-base"    aria-selected="false">🧙  Nvim core  <span class="badge">17</span></button>
+  <button class="tab-btn"        role="tab" data-tab="nvim-telescope" aria-selected="false">🔭  Telescope  <span class="badge">13</span></button>
+  <button class="tab-btn"        role="tab" data-tab="nvim-harpoon" aria-selected="false">⚓  Harpoon    <span class="badge">6</span></button>
+  <button class="tab-btn"        role="tab" data-tab="nvim-oil"     aria-selected="false">📁  Oil        <span class="badge">2</span></button>
+  <button class="tab-btn"        role="tab" data-tab="nvim-lsp"     aria-selected="false">🤖  LSP        <span class="badge">9</span></button>
+</div>
+
+<!-- ==================== SHELL ==================== -->
+<div class="panel active" id="panel-shell" role="tabpanel">
+<div class="section">
+  <h2>🐚 Shell aliases <span class="hint">defined in <code>~/.zshrc</code></span></h2>
+  <table>
+    <thead><tr><th>Alias</th><th>Expands to</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><span class="key">vim</span> / <span class="key">vi</span> / <span class="key">v</span></td><td><code>nvim</code></td><td>Open Neovim instead of vim</td></tr>
+      <tr><td><span class="key">vimdiff</span></td><td><code>nvim -d</code></td><td>Open diff mode in Neovim</td></tr>
+      <tr><td><span class="key">c</span></td><td><code>clear</code></td><td>Clear the terminal</td></tr>
+      <tr><td><span class="key">ll</span></td><td><code>ls -lah</code></td><td>Detailed listing, hidden files, human-readable sizes</td></tr>
+      <tr><td><span class="key">la</span></td><td><code>ls -la</code></td><td>Detailed listing with hidden files</td></tr>
+      <tr><td><span class="key">..</span></td><td><code>cd ..</code></td><td>Go up one directory</td></tr>
+      <tr><td><span class="key">...</span></td><td><code>cd ../..</code></td><td>Go up two directories</td></tr>
+      <tr><td><span class="key">g</span></td><td><code>git</code></td><td>Shorthand for git itself</td></tr>
+      <tr><td><span class="key">gs</span></td><td><code>git status -sb</code></td><td>Compact branch + working tree status</td></tr>
+      <tr><td><span class="key">ga</span></td><td><code>git add</code></td><td>Stage files</td></tr>
+      <tr><td><span class="key">gc</span></td><td><code>git commit</code></td><td>Open editor to commit</td></tr>
+      <tr><td><span class="key">gp</span></td><td><code>git push</code></td><td>Push commits</td></tr>
+      <tr><td><span class="key">gl</span></td><td><code>git pull</code></td><td>Pull and merge/rebase</td></tr>
+      <tr><td><span class="key">gd</span></td><td><code>git diff</code></td><td>Show unstaged changes</td></tr>
+      <tr><td><span class="key">gco</span></td><td><code>git checkout</code></td><td>Switch branches / restore files</td></tr>
+      <tr><td><span class="key">gb</span></td><td><code>git branch</code></td><td>List/manage branches</td></tr>
+      <tr><td><span class="key">pbc</span></td><td><code>pbcopy</code></td><td>Pipe output into macOS clipboard</td></tr>
+      <tr><td><span class="key">pbp</span></td><td><code>pbpaste</code></td><td>Paste clipboard content to stdout</td></tr>
+      <tr><td><span class="key">rg</span></td><td><code>rg --smart-case</code></td><td>Ripgrep with smart-case matching</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>🔧 Shell features</h2>
+  <table>
+    <thead><tr><th>Feature</th><th>Trigger</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td>zoxide</td><td><span class="key">z</span> <i>partial</i></td><td>Jump to a directory you've visited before (learns your habits)</td></tr>
+      <tr><td>fzf history</td><td><span class="key">Ctrl-R</span></td><td>Search through command history</td></tr>
+      <tr><td>fzf files</td><td><span class="key">Ctrl-T</span></td><td>Insert a file path into the current command</td></tr>
+      <tr><td>fzf dirs</td><td><span class="key">Alt-C</span></td><td><code>cd</code> into a selected directory</td></tr>
+      <tr><td>auto-cd</td><td>type a dir name</td><td>Just type a path to <code>cd</code> — no <code>cd</code> needed</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<!-- ==================== GIT ==================== -->
+<div class="panel" id="panel-git" role="tabpanel">
+<div class="section">
+  <h2>🐙 Git aliases <span class="hint">defined in <code>~/.config/git/config</code></span></h2>
+  <table>
+    <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><span class="cmd">git st</span></td><td><code>status -sb</code> — compact working tree status</td></tr>
+      <tr><td><span class="cmd">git co</span></td><td><code>checkout</code> — switch branches or restore files</td></tr>
+      <tr><td><span class="cmd">git br</span></td><td><code>branch</code> — list/manage branches</td></tr>
+      <tr><td><span class="cmd">git ci</span></td><td><code>commit</code> — create a commit</td></tr>
+      <tr><td><span class="cmd">git lg</span></td><td>Oneline graph of last 20 commits <span class="note"><code>--oneline --graph --decorate -20</code></span></td></tr>
+      <tr><td><span class="cmd">git ll</span></td><td>Oneline graph of last 30 commits <span class="note"><code>--oneline --graph --decorate --all -30</code></span></td></tr>
+      <tr><td><span class="cmd">git last</span></td><td>Show last commit with stats <span class="note"><code>log -1 --stat</code></span></td></tr>
+      <tr><td><span class="cmd">git unstage</span></td><td><code>restore --staged</code> — unstage a file but keep changes</td></tr>
+      <tr><td><span class="cmd">git undo</span></td><td><code>reset --soft HEAD~1</code> — undo last commit, keep changes staged</td></tr>
+      <tr><td><span class="cmd">git fomo</span></td><td>Fetch default branch + rebase your current branch onto it (with autostash)</td></tr>
+      <tr><td><span class="cmd">git cleanup</span></td><td>Delete local branches already merged into default branch <span class="note">Runs <code>fetch --prune</code> first</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>⚙️ Git config highlights</h2>
+  <table>
+    <thead><tr><th>Setting</th><th>Value</th><th>Benefit</th></tr></thead>
+    <tbody>
+      <tr><td><code>pull.rebase</code></td><td><code>true</code></td><td><code>git pull</code> rebases instead of merging — cleaner history</td></tr>
+      <tr><td><code>push.autoSetupRemote</code></td><td><code>true</code></td><td><code>git push</code> on a new branch automatically sets up tracking</td></tr>
+      <tr><td><code>push.default</code></td><td><code>simple</code></td><td>Push only the current branch to a matching upstream</td></tr>
+      <tr><td><code>rerere.enabled</code></td><td><code>true</code></td><td>Git remembers how you resolved a conflict — auto-resolves next time</td></tr>
+      <tr><td><code>merge.conflictstyle</code></td><td><code>zdiff3</code></td><td>Shows base/origin/both in conflict markers — easier to resolve</td></tr>
+      <tr><td><code>diff.algorithm</code></td><td><code>histogram</code></td><td>Smarter, more readable diffs</td></tr>
+      <tr><td><code>diff.colorMoved</code></td><td><code>plain</code></td><td>Highlight moved blocks in diffs</td></tr>
+      <tr><td><code>branch.sort</code></td><td><code>-committerdate</code></td><td><code>git branch</code> lists branches most recently used first</td></tr>
+      <tr><td><code>column.ui</code></td><td><code>auto</code></td><td>Tabular output for <code>git status</code>, <code>branch</code>, etc.</td></tr>
+      <tr><td><code>core.editor</code></td><td><code>nvim</code></td><td>Commit messages, interactive rebase, etc. open in Neovim</td></tr>
+      <tr><td><code>init.defaultBranch</code></td><td><code>main</code></td><td>New repos default to <code>main</code> instead of <code>master</code></td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<!-- ==================== NVIM BASE ==================== -->
+<div class="panel" id="panel-nvim-base" role="tabpanel">
+<div class="section">
+  <h2>🧙 Core editor keymaps <span class="hint">defined in <code>~/.config/nvim/lua/config/keymaps.lua</code></span></h2>
+  <table>
+    <thead><tr><th>Keys</th><th>Mode</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><span class="key">Esc</span></td><td>normal</td><td>Clear search highlight <span class="note">(instead of <code>:nohlsearch</code>)</span></td></tr>
+      <tr><td><span class="key">jj</span> / <span class="key">jk</span></td><td>insert</td><td>Escape insert mode — no need to reach for Escape</td></tr>
+      <tr><td><span class="key">H</span></td><td>n/v/o</td><td><code>^</code> — jump to first non-whitespace character of line</td></tr>
+      <tr><td><span class="key">L</span></td><td>n/v/o</td><td><code>$</code> — jump to end of line</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;w</span></td><td>normal</td><td><code>:w</code> — save file</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;q</span></td><td>normal</td><td><code>:q</code> — quit current window</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;Q</span></td><td>normal</td><td><code>:qa!</code> — quit all</td></tr>
+      <tr><td><span class="key">&lt;C-h&gt;</span></td><td>normal</td><td><code>&lt;C-w&gt;h</code> — jump to left window split</td></tr>
+      <tr><td><span class="key">&lt;C-j&gt;</span></td><td>normal</td><td><code>&lt;C-w&gt;j</code> — jump to window below</td></tr>
+      <tr><td><span class="key">&lt;C-k&gt;</span></td><td>normal</td><td><code>&lt;C-w&gt;k</code> — jump to window above</td></tr>
+      <tr><td><span class="key">&lt;C-l&gt;</span></td><td>normal</td><td><code>&lt;C-w&gt;l</code> — jump to right window split</td></tr>
+      <tr><td><span class="key">&lt;A-h&gt;</span></td><td>normal</td><td><code>:vertical resize -2</code> — shrink split width</td></tr>
+      <tr><td><span class="key">&lt;A-l&gt;</span></td><td>normal</td><td><code>:vertical resize +2</code> — grow split width</td></tr>
+      <tr><td><span class="key">&lt;A-j&gt;</span></td><td>normal</td><td><code>:resize -2</code> — shrink split height</td></tr>
+      <tr><td><span class="key">&lt;A-k&gt;</span></td><td>normal</td><td><code>:resize +2</code> — grow split height</td></tr>
+      <tr><td><span class="key">&lt;S-h&gt;</span></td><td>normal</td><td><code>:bprevious</code> — previous buffer</td></tr>
+      <tr><td><span class="key">&lt;S-l&gt;</span></td><td>normal</td><td><code>:bnext</code> — next buffer</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;bd</span></td><td>normal</td><td><code>:bdelete</code> — delete (close) current buffer</td></tr>
+      <tr><td><span class="key">J</span></td><td>visual</td><td>Move selected lines <strong>down</strong> (re-indented)</td></tr>
+      <tr><td><span class="key">K</span></td><td>visual</td><td>Move selected lines <strong>up</strong> (re-indented)</td></tr>
+      <tr><td><span class="key">&lt;C-d&gt;</span></td><td>normal</td><td>Scroll half-page down, then center cursor (<code>zz</code>)</td></tr>
+      <tr><td><span class="key">&lt;C-u&gt;</span></td><td>normal</td><td>Scroll half-page up, then center cursor (<code>zz</code>)</td></tr>
+      <tr><td><span class="key">n</span></td><td>normal</td><td>Next search result, center cursor (<code>nzzzv</code>)</td></tr>
+      <tr><td><span class="key">N</span></td><td>normal</td><td>Previous search result, center cursor (<code>Nzzzv</code>)</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;p</span></td><td>visual</td><td>Paste over selection without yanking the replaced text (uses black hole register)</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;y</span></td><td>n/v</td><td>Yank to system clipboard (<code>"+y</code>)</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;Y</span></td><td>normal</td><td>Yank current line to system clipboard</td></tr>
+      <tr><td><span class="key">[d</span></td><td>normal</td><td>Jump to previous diagnostic with float preview</td></tr>
+      <tr><td><span class="key">]d</span></td><td>normal</td><td>Jump to next diagnostic with float preview</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;d</span></td><td>normal</td><td>Open diagnostic float for current line</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;td</span></td><td>normal</td><td>Toggle diagnostics on/off globally</td></tr>
+      <tr><td><span class="key">&lt;</span> / <span class="key">&gt;</span></td><td>visual</td><td>Indent left/right, re-select the text — keep indenting</td></tr>
+      <tr><td><span class="key">&lt;C-a&gt;</span></td><td>normal</td><td><code>ggVG</code> — select entire file</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<!-- ==================== TELESCOPE ==================== -->
+<div class="panel" id="panel-nvim-telescope" role="tabpanel">
+<div class="section">
+  <h2>🔭 Telescope keymaps <span class="hint">defined in <code>~/.config/nvim/lua/plugins/telescope.lua</code></span></h2>
+  <table>
+    <thead><tr><th>Keys</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><span class="key">&lt;leader&gt;ff</span></td><td><strong>Find files</strong> — respects <code>.gitignore</code>, also searches hidden files</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;fg</span></td><td><strong>Live grep</strong> — search file contents in real time (ripgrep backend)</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;fb</span></td><td>List <strong>buffers</strong> (open files)</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;fh</span></td><td>Search <strong>help tags</strong></td></tr>
+      <tr><td><span class="key">&lt;leader&gt;fr</span></td><td><strong>Recent files</strong> (<code>oldfiles</code>)</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;fw</span></td><td>Grep for <strong>word under cursor</strong></td></tr>
+      <tr><td><span class="key">&lt;leader&gt;fd</span></td><td>Show <strong>diagnostics</strong> across project</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;fs</span></td><td>Jump to <strong>symbol</strong> in current file (LSP)</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;fS</span></td><td>Jump to <strong>symbol</strong> in entire workspace (LSP)</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;fk</span></td><td>Search all <strong>keymaps</strong> — great for discovering your own mappings!</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;fc</span></td><td>Browse <strong>git commits</strong></td></tr>
+      <tr><td><span class="key">&lt;leader&gt;fB</span></td><td>Browse <strong>git branches</strong></td></tr>
+      <tr><td><span class="key">&lt;leader&gt;/</span></td><td><strong>Fuzzy search</strong> inside the current buffer</td></tr>
+    </tbody>
+  </table>
+</div>
+<div class="section">
+  <h2>🎮 Inside a Telescope picker</h2>
+  <table>
+    <thead><tr><th>Keys</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><span class="key">&lt;C-j&gt;</span></td><td>Move selection down</td></tr>
+      <tr><td><span class="key">&lt;C-k&gt;</span></td><td>Move selection up</td></tr>
+      <tr><td><span class="key">&lt;C-q&gt;</span></td><td>Send selected items to quickfix list + open it</td></tr>
+      <tr><td><span class="key">Esc</span></td><td>Close picker</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<!-- ==================== HARPOON ==================== -->
+<div class="panel" id="panel-nvim-harpoon" role="tabpanel">
+<div class="section">
+  <h2>⚓ Harpoon keymaps <span class="hint">defined in <code>~/.config/nvim/lua/plugins/harpoon.lua</code></span></h2>
+  <table>
+    <thead><tr><th>Keys</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><span class="key">&lt;leader&gt;a</span></td><td><strong>Add</strong> current file to Harpoon's list</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;h</span></td><td><strong>Show Harpoon menu</strong> — pick a file to jump to</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;1</span></td><td>Jump to <strong>harpoon slot 1</strong></td></tr>
+      <tr><td><span class="key">&lt;leader&gt;2</span></td><td>Jump to <strong>harpoon slot 2</strong></td></tr>
+      <tr><td><span class="key">&lt;leader&gt;3</span></td><td>Jump to <strong>harpoon slot 3</strong></td></tr>
+      <tr><td><span class="key">&lt;leader&gt;4</span></td><td>Jump to <strong>harpoon slot 4</strong></td></tr>
+    </tbody>
+  </table>
+  <p style="color:var(--subtext);font-size:.85rem;margin-top:.75rem;">
+    <strong>💡 Workflow:</strong> Mark the 3–4 files you're actively working on with <code>&lt;leader&gt;a</code>,
+    then bounce between them with <code>&lt;leader&gt;1</code>–<code>&lt;leader&gt;4</code>.
+    Much faster than buffer-switching or finding files again.
+  </p>
+</div>
+</div>
+
+<!-- ==================== OIL ==================== -->
+<div class="panel" id="panel-nvim-oil" role="tabpanel">
+<div class="section">
+  <h2>📁 Oil keymaps <span class="hint">defined in <code>~/.config/nvim/lua/plugins/oil.lua</code></span></h2>
+  <table>
+    <thead><tr><th>Keys</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><span class="key">-</span></td><td><strong>Open parent directory</strong> as an Oil buffer (from any file)</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;e</span></td><td><strong>Open Oil</strong> as a file explorer in current directory</td></tr>
+      <tr><td><span class="key">q</span></td><td>Close the Oil buffer <span class="note">(custom mapping overrides default)</span></td></tr>
+    </tbody>
+  </table>
+  <p style="color:var(--subtext);font-size:.85rem;margin-top:.75rem;">
+    <strong>💡 What makes Oil special?</strong> The directory listing is an editable buffer.
+    Use normal vim keys: <code>dd</code> to delete, <code>p</code> to paste, <code>cw</code> to rename,
+    then <code>:w</code> to apply changes. No need for a separate file tree plugin.
+  </p>
+</div>
+</div>
+
+<!-- ==================== LSP ==================== -->
+<div class="panel" id="panel-nvim-lsp" role="tabpanel">
+<div class="section">
+  <h2>🤖 LSP keymaps <span class="hint">defined in <code>~/.config/nvim/lua/plugins/lsp.lua</code></span></h2>
+  <table>
+    <thead><tr><th>Keys</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><span class="key">gd</span></td><td><strong>Go to definition</strong></td></tr>
+      <tr><td><span class="key">gD</span></td><td><strong>Go to declaration</strong></td></tr>
+      <tr><td><span class="key">gr</span></td><td><strong>Find references</strong></td></tr>
+      <tr><td><span class="key">gi</span></td><td><strong>Go to implementation</strong></td></tr>
+      <tr><td><span class="key">gt</span></td><td><strong>Go to type definition</strong></td></tr>
+      <tr><td><span class="key">K</span></td><td><strong>Hover</strong> — show type info, docs, and signatures</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;rn</span></td><td><strong>Rename symbol</strong> across the entire project</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;ca</span></td><td><strong>Code actions</strong> — refactor, quick fix, import, etc.</td></tr>
+      <tr><td><span class="key">&lt;leader&gt;rs</span></td><td><strong>Restart LSP</strong> — useful if a server gets flaky</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>🧰 Mason-managed tools</h2>
+  <p style="color:var(--subtext);font-size:.85rem;">
+    Language servers and formatters are auto-installed via Mason. Currently configured:
+    <span style="color:var(--yellow);font-family:var(--mono);font-size:.82rem;">
+      lua_ls, ts_ls (TypeScript), eslint, jsonls, html, cssls, tailwindcss,
+      pyright (Python), bashls, yamlls
+    </span>
+    <br><br>
+    Formatters (Conform): <span style="color:var(--yellow);font-family:var(--mono);font-size:.82rem;">
+      stylua, prettier, black, shfmt
+    </span>
+  </p>
+</div>
+</div>
+
+<script>
+(function() {
+  // Tab switching
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.panel');
+
+  function activatePanel(id) {
+    // Deactivate all
+    tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+    panels.forEach(p => p.classList.remove('active'));
+
+    // Activate target
+    const btn = document.querySelector(`.tab-btn[data-tab="${id}"]`);
+    const panel = document.getElementById(`panel-${id}`);
+    if (btn && panel) {
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      panel.classList.add('active');
+    }
+  }
+
+  // Click handler
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-tab');
+      history.replaceState(null, '', `#${id}`);
+      activatePanel(id);
+    });
+  });
+
+  // Hash change
+  function onHash() {
+    const hash = location.hash.replace('#', '');
+    if (hash && document.getElementById(`panel-${hash}`)) {
+      activatePanel(hash);
+    }
+  }
+  window.addEventListener('hashchange', onHash);
+
+  // Initial activation from hash
+  if (location.hash) {
+    onHash();
+  }
+
+  // Also allow in-page anchor links to match the hash
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const hash = a.getAttribute('href').replace('#', '');
+      if (document.getElementById(`panel-${hash}`)) {
+        e.preventDefault();
+        history.pushState(null, '', `#${hash}`);
+        activatePanel(hash);
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>
