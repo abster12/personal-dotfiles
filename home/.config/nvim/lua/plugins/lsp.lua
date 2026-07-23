@@ -22,6 +22,7 @@ return {
         "bash-language-server",
         "shfmt",
         "yaml-language-server",
+        "jdtls",
       },
     },
   },
@@ -131,6 +132,7 @@ return {
           "pyright",
           "bashls",
           "yamlls",
+          "jdtls",
         },
         automatic_enable = true,
       })

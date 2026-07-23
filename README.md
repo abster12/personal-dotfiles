@@ -64,17 +64,21 @@ Leader key: `<Space>`
 | **render-markdown.nvim** | Render markdown in-buffer |
 | **undotree** | Visual undo history |
 
-### Formatters
+### Language Servers & Formatters
 
-| Language | Formatter |
-|----------|----------|
-| Python | black |
-| JavaScript/TypeScript | prettier |
-| JSON, HTML, CSS, SCSS, YAML | prettier |
-| Lua | stylua |
-| Shell (sh/bash/zsh) | shfmt |
+| Language | LSP Server | Formatter |
+|----------|-----------|-----------|
+| Lua | lua-language-server | stylua |
+| JavaScript/TypeScript | ts_ls + eslint | prettier |
+| JSON | json-lsp | prettier |
+| HTML | html-lsp | prettier |
+| CSS/SCSS | css-lsp | prettier |
+| Python | pyright | black |
+| Shell (sh/bash/zsh) | bashls | shfmt |
+| YAML | yamlls | prettier |
+| Java | jdtls | — |
 
-All formatters are auto-installed via **Mason** on first launch.
+All language servers and formatters are auto-installed via **Mason** on first launch.
 
 ### File Navigation (Telescope)
 
