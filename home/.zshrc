@@ -61,3 +61,15 @@ fi
 if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
 fi
+
+# meat (reading-diff tool)
+export MEAT_MODEL="opencode-go/gpt-5.6-luna"
+
+# >>> grok installer >>>
+export PATH="$HOME/.grok/bin:$PATH"
+fpath=(~/.grok/completions/zsh $fpath)
+autoload -Uz compinit && compinit -C
+# <<< grok installer <<<
+
+# Machine-local secrets (not in git)
+[[ -f "$HOME/.local-secrets" ]] && source "$HOME/.local-secrets"

@@ -9,6 +9,7 @@
 	editor = nvim
 	autocrlf = input
 	excludesfile = ~/.config/git/ignore
+	hooksPath = ~/.githooks
 
 [pull]
 	rebase = true
