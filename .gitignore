@@ -2,3 +2,8 @@
 *.bak.*
 .local-secrets
 **/.luarc.json
+
+# Pi credentials and local authentication
+home/.pi/agent/auth.json
+home/.pi/agent/*credentials*
+home/.pi/agent/*.key
