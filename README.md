@@ -7,6 +7,7 @@ Personal macOS dev environment. Managed with [GNU Stow](https://www.gnu.org/soft
 - **Shell:** zsh + Starship + fzf + zoxide
 - **Editor:** Neovim (lazy.nvim)
 - **Terminal:** Ghostty (Catppuccin Macchiato, JetBrains Mono Nerd Font)
+- **Window manager:** AeroSpace
 - **Git:** sensible defaults + aliases
 - **Packages:** Homebrew Brewfile
 
@@ -33,10 +34,16 @@ cd ~/.dotfiles && stow --restow --target=$HOME home
 └── home/                 # stowed → ~
     ├── .zshrc
     ├── .zprofile
+    ├── .aerospace.toml
+    ├── .githooks/
+    ├── .agents/
+    ├── .pi/
     └── .config/
         ├── nvim/
         ├── ghostty/
         ├── git/
+        ├── mcp/
+        ├── ponytail/
         ├── starship.toml
         └── ripgrep/
 ```

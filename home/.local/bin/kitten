@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+#
+# Minimal `kitten` shim for macOS (local, non-SSH use).
+#
+# pi-essentials' /ss command calls:
+#     kitten clipboard --get-clipboard --mime <type>
+# and expects the raw image bytes on stdout. On a local Mac we don't have
+# kitty's remote clipboard protocol, so we read the clipboard image with
+# macOS native tools (osascript + sips) and emit it in the requested format.
+#
+# This keeps the extension untouched and survives package updates.
+
+mime=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --mime) mime="$2"; shift 2 ;;
+    *) shift ;;
+  esac
+done
+
+dir=$(mktemp -d -t kitten-clip.XXXXXX)
+trap 'rm -rf "$dir"' EXIT
+
+png="$dir/clip.png"
+
+# Read whatever image is on the clipboard as PNG.
+osascript -e 'try
+  set theData to the clipboard as «class PNGf»
+  set f to (open for access POSIX file "'"$png"'" with write permission)
+  write theData to f
+  close access f
+on error
+  -- no image on clipboard
+end try' 2>/dev/null
+
+# Nothing on the clipboard -> exit non-zero so the extension tries the next mime.
+if [[ ! -s "$png" ]]; then
+  exit 1
+fi
+
+case "$mime" in
+  image/jpeg)
+    jpg="$dir/clip.jpg"
+    if sips -s format jpeg "$png" --out "$jpg" >/dev/null 2>&1 && [[ -s "$jpg" ]]; then
+      cat "$jpg"
+    else
+      cat "$png"
+    fi
+    ;;
+  image/gif)
+    gif="$dir/clip.gif"
+    if sips -s format gif "$png" --out "$gif" >/dev/null 2>&1 && [[ -s "$gif" ]]; then
+      cat "$gif"
+    else
+      cat "$png"
+    fi
+    ;;
+  *)
+    # PNG (and webp fallback to PNG; sips can't emit webp)
+    cat "$png"
+    ;;
+esac

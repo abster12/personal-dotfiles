@@ -1,0 +1,8 @@
+#!/bin/sh
+# Strip Cursor agent attribution trailers from commit messages.
+# Enable: git config --global core.hooksPath ~/.githooks
+
+MSG_FILE="$1"
+TMP=$(mktemp)
+grep -v -E '^(Co-authored-by: Cursor|Made-with: Cursor|Made with Cursor)' "$MSG_FILE" >"$TMP" || true
+mv "$TMP" "$MSG_FILE"
