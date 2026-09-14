@@ -3,6 +3,9 @@ export EDITOR="nvim"
 export VISUAL="nvim"
 export MANPAGER="nvim +Man!"
 
+# Pi: emit OSC 8 hyperlinks inside Herdr and other multiplexers
+export PI_HYPERLINKS=1
+
 # ripgrep
 export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/config"
 
