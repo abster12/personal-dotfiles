@@ -33,6 +33,7 @@ opt.sidescrolloff = 8
 opt.colorcolumn = "80"
 opt.showmode = false
 opt.wrap = false
+opt.linebreak = true
 opt.splitbelow = true
 opt.splitright = true
 opt.list = true
