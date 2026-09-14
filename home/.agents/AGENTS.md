@@ -21,6 +21,9 @@ When the user types `/graphify`, load that skill before doing anything else.
 
 On React/Tailwind UI: use a ReUI component from https://reui.io/components (`npx shadcn@latest add`) before writing a custom one.
 
+**impeccable** (`~/.pi/agent/skills/impeccable/SKILL.md`) — design, critique, audit, polish. Trigger: `/impeccable`
+When the user types `/impeccable`, load that skill before doing anything else.
+
 <!-- ## Prewalk
 
 On a spec or multi-file feature, serial — each step starts only after the previous result is in this session:
